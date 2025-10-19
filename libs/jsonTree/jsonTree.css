@@ -4,6 +4,8 @@
  *
  * Copyright 2017 Vera Lobacheva (http://iamvera.com)
  * Released under the MIT license (LICENSE.txt)
+ *
+ * Modified by teebow1e (https://trungtqt.com) and hosted on https://json.đặc.vn.
  */
 
 /* Background for the tree. May use for <body> element */
@@ -14,7 +16,7 @@
 /* Styles for the container of the tree (e.g. fonts, margins etc.) */
 .jsontree_tree {
     margin-left: 30px;
-    font-family: 'PT Mono', monospace;
+    font-family: 'Roboto Mono', monospace;
     font-size: 14px;
 }
 

@@ -4,6 +4,8 @@
  *
  * Copyright 2017 Vera Lobacheva (http://iamvera.com)
  * Released under the MIT license (LICENSE.txt)
+ * 
+ * Modified by teebow1e (https://trungtqt.com) and hosted on https://json.đặc.vn.
  */
 
 var jsonTree = (function() {
@@ -77,7 +79,9 @@ var jsonTree = (function() {
                     break;
                 
                 case 'object':
-                    var keys = Object.keys(obj).sort();
+                    // var keys = Object.keys(obj).sort();
+                    // preserve the original order of the data
+                    var keys = Object.keys(obj);
                     
                     isLast = keys.length - 1;
                     

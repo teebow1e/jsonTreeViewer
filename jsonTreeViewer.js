@@ -4,6 +4,8 @@
  *
  * Copyright 2017 Vera Lobacheva (http://iamvera.com)
  * Released under the MIT license (LICENSE.txt)
+ * 
+ * Modified by teebow1e (https://trungtqt.com) and hosted on https://json.đặc.vn.
  */
 
 'use strict';

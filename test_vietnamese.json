@@ -1,0 +1,45 @@
+{
+  "greeting": "Xin chào",
+  "introduction": "Đây là một tệp JSON chứa nội dung tiếng Việt để kiểm tra phông chữ.",
+  "sample_text": {
+    "title": "Tiêu đề mẫu",
+    "description": "Đây là đoạn văn bản mẫu bằng tiếng Việt, bao gồm các ký tự đặc biệt như dấu thanh và ký tự Unicode: á, à, ả, ã, ạ, ă, ắ, ằ, ẳ, ẵ, ặ, â, ấ, ầ, ẩ, ẫ, ậ, đ, é, è, ẻ, ẽ, ẹ, ê, ế, ề, ể, ễ, ệ, í, ì, ỉ, ĩ, ị, ó, ò, ỏ, õ, ọ, ô, ố, ồ, ổ, ỗ, ọ, ơ, ớ, ờ, ở, ỡ, ợ, ú, ù, ủ, ũ, ụ, ư, ứ, ừ, ử, ữ, ự, ý, ỳ, ỷ, ỹ, ỵ.",
+    "long_text": "Tiếng Việt là ngôn ngữ chính thức của Việt Nam, thuộc nhóm ngôn ngữ Nam Á. Nó sử dụng bảng chữ cái Latinh với các dấu thanh để biểu thị ngữ điệu. Tiếng Việt có sáu thanh điệu: ngang, huyền, sắc, hỏi, ngã, nặng. Các thanh điệu này kết hợp với các nguyên âm và phụ âm để tạo ra sự phong phú trong cách phát âm. Ví dụ: từ 'ma' có thể có nghĩa khác nhau tùy thuộc vào dấu thanh, như 'má' (mẹ), 'mà' (nhưng), 'mả' (mộ), 'mã' (mã số), 'mạ' (lúa non), hoặc 'ma' (ma quỷ)."
+  },
+  "common_phrases": [
+    {
+      "phrase": "Cảm ơn bạn rất nhiều!",
+      "meaning": "Thank you very much!"
+    },
+    {
+      "phrase": "Bạn khỏe không?",
+      "meaning": "How are you?"
+    },
+    {
+      "phrase": "Chúc bạn một ngày tốt lành!",
+      "meaning": "Have a nice day!"
+    }
+  ],
+  "numbers": {
+    "one": "một",
+    "two": "hai",
+    "three": "ba",
+    "four": "bốn",
+    "five": "năm",
+    "six": "sáu",
+    "seven": "bảy",
+    "eight": "tám",
+    "nine": "chín",
+    "ten": "mười"
+  },
+  "special_characters": {
+    "vowels": ["á", "à", "ả", "ã", "ạ", "ă", "ắ", "ằ", "ẳ", "ẵ", "ặ", "â", "ấ", "ầ", "ẩ", "ẫ", "ậ"],
+    "consonants": ["đ"],
+    "combined": ["ứ", "ừ", "ử", "ữ", "ự", "ế", "ề", "ể", "ễ", "ệ"]
+  },
+  "sample_sentence": "Việt Nam là một quốc gia xinh đẹp với văn hóa đa dạng và lịch sử lâu đời.",
+  "poem": {
+    "title": "Bài thơ ngắn",
+    "content": "Trăng treo lơ lửng giữa trời cao,\nGió thoảng mây trôi nhẹ lướt vào.\nSông nước lấp lánh ngàn ánh bạc,\nQuê hương yêu dấu mãi tự hào."
+  }
+}

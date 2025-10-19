@@ -1,0 +1,1 @@
+zip -r jsonviewer.zip . -x "README.md" "test_vietnamese.json" ".git/*" "compress-prj.sh"
