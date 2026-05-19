@@ -156,16 +156,67 @@ var jsonTreeViewer = (function() {
 
     load_json_form.show();
     
+    var MODES = { STRICT: 0, LENIENT: 1, REPAIRED: 2 };
+
+    function setParseMode(mode) {
+        var el = document.getElementById('lenient_indicator');
+        if (!el) return;
+        if (mode === MODES.STRICT) {
+            el.style.display = 'none';
+        } else if (mode === MODES.LENIENT) {
+            el.style.display = 'inline-block';
+            el.textContent = 'lenient mode';
+            el.style.background = '#fff4d6';
+            el.style.color = '#7a5300';
+            el.style.borderColor = '#e8c87a';
+            el.title = 'Strict JSON.parse failed; JSON5 (lenient grammar) parsed it.';
+        } else if (mode === MODES.REPAIRED) {
+            el.style.display = 'inline-block';
+            el.textContent = 'repaired';
+            el.style.background = '#ffe2e2';
+            el.style.color = '#8a1f1f';
+            el.style.borderColor = '#f1a8a8';
+            el.title = 'Input was structurally broken (missing commas, unclosed strings/braces, etc.). jsonrepair reconstructed a best-guess valid JSON before rendering.';
+        }
+    }
+
+    function tryRepair(json_str) {
+        if (typeof JSONRepair === 'undefined' || !JSONRepair.jsonrepair) return undefined;
+        var repaired = JSONRepair.jsonrepair(json_str);
+        return JSON.parse(repaired);
+    }
+
     return {
         parse : function(json_str) {
-            var temp;
-            
+            var temp, errs = {};
+
             try {
                 temp = JSON.parse(json_str);
-            } catch(e) {
-                alert(e);
+                setParseMode(MODES.STRICT);
+            } catch (e1) {
+                errs.strict = e1.message;
+                try {
+                    if (typeof JSON5 === 'undefined') throw new Error('JSON5 not loaded');
+                    temp = JSON5.parse(json_str);
+                    setParseMode(MODES.LENIENT);
+                } catch (e2) {
+                    errs.lenient = e2.message;
+                    try {
+                        temp = tryRepair(json_str);
+                        if (typeof temp === 'undefined') throw new Error('jsonrepair not loaded');
+                        setParseMode(MODES.REPAIRED);
+                    } catch (e3) {
+                        errs.repair = e3.message;
+                        alert('Could not parse JSON.\n\n' +
+                              'Strict:    ' + errs.strict + '\n' +
+                              'Lenient:   ' + errs.lenient + '\n' +
+                              'Repair:    ' + errs.repair);
+                        return;
+                    }
+                }
             }
-            
+
+            if (typeof temp === 'undefined') return;
             tree.loadData(temp);
         }
     };

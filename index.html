@@ -54,6 +54,9 @@
                     <span class="menu__item-name">?</span>
                 </li>
             </ul>
+            <span id="lenient_indicator"
+                  title="Strict JSON.parse failed; JSON5 (lenient) parsed it instead. Trailing commas, unquoted keys, single quotes, comments, etc. are accepted."
+                  style="display:none;margin-left:12px;padding:2px 8px;border-radius:10px;font:11px/1.6 'Roboto Mono',monospace;background:#fff4d6;color:#7a5300;border:1px solid #e8c87a;">lenient&nbsp;mode</span>
         </nav>
         <div id="coords"></div>
         <div id="debug"></div>
@@ -192,6 +195,8 @@
     
     <script src="libs/app/App.js"></script>
     <script src="libs/jsonTree/jsonTree.js"></script>
+    <script src="libs/json5/json5.min.js"></script>
+    <script src="libs/jsonrepair/jsonrepair.js"></script>
     <script src="jsonTreeViewer.js"></script>
     <script>
         var example = '{\
