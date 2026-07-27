@@ -19,3 +19,4 @@ Online: http://summerstyle.github.io/jsonTreeViewer
 3. Expand/collapse all tree nodes by click on "expand all" and "collapse all" buttons
 4. Mark/unmark node labels by click on label with pressed `ALT` key
 5. Show JSONPath of node by click on label with pressed `SHIFT` key
+6. Filter fields by selecting generated field paths, for example `.firstName`, `.address.city`, or `.phoneNumbers[].number`

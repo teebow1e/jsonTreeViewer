@@ -274,6 +274,12 @@
 .form .checkboxes > li {
     margin-bottom: 5px;
 }
+.form__hint {
+    color: #999;
+    font-size: 11px;
+    line-height: 1.4;
+    margin-top: 7px;
+}
 .form textarea {
     width: 100%;
     display: inline-block;
@@ -290,6 +296,22 @@
     padding: 2px 7px;
     border: 1px solid #E1E1E1;
     box-sizing: border-box;
+}
+.field-filter-options {
+    border: 1px solid #E1E1E1;
+    border-radius: 3px;
+    box-sizing: border-box;
+    max-height: 240px;
+    overflow: auto;
+    padding: 6px 7px;
+}
+.field-filter-options label {
+    display: block;
+    line-height: 1.7;
+    white-space: nowrap;
+}
+.field-filter-options input {
+    margin-right: 6px;
 }
 .form button {
     border: 0;

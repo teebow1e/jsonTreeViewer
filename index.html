@@ -44,6 +44,12 @@
                 <li data-action="find_and_mark" class="menu__item">
                     <span class="menu__item-name">find and mark</span>
                 </li>
+                <li data-action="filter_fields" class="menu__item">
+                    <span class="menu__item-name">filter fields</span>
+                </li>
+                <li data-action="clear_filter" class="menu__item">
+                    <span class="menu__item-name">clear filter</span>
+                </li>
                 <li data-action="unmark_all" class="menu__item">
                     <span class="menu__item-name">unmark all</span>
                 </li>
@@ -100,6 +106,12 @@
                 <h5>5. Show JSONPath of node</h5>
                 <p>
                     By click on label with pressed SHIFT key
+                </p>
+            </section>
+            <section>
+                <h5>6. Filter fields</h5>
+                <p>
+                    Click "filter fields", select the fields you want to keep, then apply the filter.
                 </p>
             </section>
             <footer>
@@ -188,6 +200,20 @@
             </ul>
         </section>
         <button id="find_button">Find and mark</button>
+    </form>
+
+    <!-- Filter fields form -->
+    <form id="filter_fields_form" class="form" data-header="Filter fields">
+        <section>
+            <p>
+                Select fields to show:
+            </p>
+            <div id="field_filter_options" class="field-filter-options"></div>
+            <p class="form__hint">
+                Fields are generated from the currently loaded JSON. Arrays are shown as [] so one selection applies to every item.
+            </p>
+        </section>
+        <button id="filter_fields_button">Apply filter</button>
     </form>
 
     <!-- For source JSON -->

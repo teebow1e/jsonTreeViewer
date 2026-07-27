@@ -17,6 +17,7 @@ var jsonTreeViewer = (function() {
     
     var treeWrapper = document.getElementById("tree");
     var tree = jsonTree.create({}, treeWrapper);
+    var sourceJSONObj = {};
     
     // Menu
     var menu = new App.Menu(utils.dom.id('nav'), {
@@ -36,6 +37,12 @@ var jsonTreeViewer = (function() {
         },
         'find_and_mark' : function() {
             find_nodes_form.show();
+        },
+        'filter_fields' : function() {
+            filter_fields_form.show();
+        },
+        'clear_filter' : function() {
+            tree.loadData(sourceJSONObj);
         },
         'unmark_all' : function() {
             tree.unmarkAll();
@@ -64,6 +71,45 @@ var jsonTreeViewer = (function() {
             }
             
             load_button.addEventListener('click', load, false);
+        }
+    });
+
+    /* Filter fields form */
+    var filter_fields_form = new App.Window({
+        content_el : utils.dom.id('filter_fields_form'),
+        overlay : true,
+        js_module : function(self) {
+            var field_filter_options = document.getElementById('field_filter_options'),
+                filter_fields_button = document.getElementById('filter_fields_button');
+
+            var originalShow = self.show;
+            self.show = function() {
+                renderFieldOptions(field_filter_options, sourceJSONObj);
+                originalShow.call(self);
+            };
+
+            function filter(e) {
+                var filter_value = getSelectedFieldSelectors(field_filter_options),
+                    filtered;
+
+                e.preventDefault();
+
+                if (!filter_value) {
+                    return;
+                }
+
+                try {
+                    filtered = projectFields(sourceJSONObj, filter_value);
+                } catch (err) {
+                    alert(err.message);
+                    return;
+                }
+
+                tree.loadData(filtered);
+                self.hide();
+            }
+
+            filter_fields_button.addEventListener('click', filter, false);
         }
     });
     
@@ -186,6 +232,245 @@ var jsonTreeViewer = (function() {
         return JSON.parse(repaired);
     }
 
+    function renderFieldOptions(container, data) {
+        var paths = uniquePaths(getFieldPaths(data, '', [], true)), html = '';
+
+        if (!paths.length) {
+            container.innerHTML = '<span class="form__hint">No selectable fields found.</span>';
+            return;
+        }
+
+        paths.forEach(function(path) {
+            html += '<label><input type="checkbox" name="field_filter" value="' + escapeHTML(path) + '" />' + escapeHTML(path) + '</label>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    function getFieldPaths(value, prefix, paths, isRoot) {
+        var valueType = Object.prototype.toString.call(value), keys;
+
+        if (valueType === '[object Array]') {
+            if (!value.length) {
+                if (prefix) paths.push(prefix);
+                return paths;
+            }
+
+            value.forEach(function(item) {
+                getFieldPaths(item, prefix + (isRoot ? '' : '[]'), paths, false);
+            });
+            return paths;
+        }
+
+        if (value !== null && valueType === '[object Object]') {
+            keys = Object.keys(value);
+            if (!keys.length) {
+                if (prefix) paths.push(prefix);
+                return paths;
+            }
+
+            keys.forEach(function(key) {
+                getFieldPaths(value[key], prefix + formatPathKey(key), paths, false);
+            });
+            return paths;
+        }
+
+        if (prefix) paths.push(prefix);
+        return paths;
+    }
+
+    function uniquePaths(paths) {
+        var seen = {}, result = [];
+
+        paths.forEach(function(path) {
+            if (!seen[path]) {
+                seen[path] = true;
+                result.push(path);
+            }
+        });
+
+        return result;
+    }
+
+    function formatPathKey(key) {
+        if (/^[A-Za-z_$][\w$]*$/.test(key)) {
+            return '.' + key;
+        }
+
+        return '[' + JSON.stringify(key) + ']';
+    }
+
+    function getSelectedFieldSelectors(container) {
+        var checkboxes = container.querySelectorAll('input[name="field_filter"]:checked'),
+            selectors = [];
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            selectors.push(checkboxes[i].value);
+        }
+
+        return selectors.join(', ');
+    }
+
+    function escapeHTML(str) {
+        return String(str).replace(/[&<>"']/g, function(ch) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[ch];
+        });
+    }
+
+    function projectFields(data, query) {
+        var selectors = parseFieldSelectors(query),
+            rootIsArray = Object.prototype.toString.call(data) === '[object Array]',
+            result = rootIsArray ? [] : {};
+
+        if (!selectors.length) {
+            throw new Error('Enter at least one field selector.');
+        }
+
+        selectors.forEach(function(selector) {
+            applySelector(result, data, selector, rootIsArray);
+        });
+
+        return result;
+    }
+
+    function parseFieldSelectors(query) {
+        return splitSelectors(query).map(function(selector) {
+            return parsePath(selector.trim());
+        }).filter(function(path) {
+            return path.length;
+        });
+    }
+
+    function splitSelectors(query) {
+        var selectors = [],
+            current = '',
+            quote = null,
+            bracketDepth = 0;
+
+        for (var i = 0; i < query.length; i++) {
+            var ch = query.charAt(i),
+                prev = query.charAt(i - 1);
+
+            if (quote) {
+                current += ch;
+                if (ch === quote && prev !== '\\') quote = null;
+                continue;
+            }
+
+            if (ch === '"' || ch === "'") {
+                quote = ch;
+                current += ch;
+            } else if (ch === '[') {
+                bracketDepth++;
+                current += ch;
+            } else if (ch === ']') {
+                bracketDepth--;
+                current += ch;
+            } else if (ch === ',' && bracketDepth === 0) {
+                selectors.push(current);
+                current = '';
+            } else {
+                current += ch;
+            }
+        }
+
+        selectors.push(current);
+        return selectors;
+    }
+
+    function parsePath(selector) {
+        var path = [], i = 0;
+
+        if (selector.charAt(0) === '.') i = 1;
+
+        while (i < selector.length) {
+            var ch = selector.charAt(i);
+
+            if (ch === '.') {
+                i++;
+                continue;
+            }
+
+            if (ch === '[') {
+                var close = selector.indexOf(']', i), token;
+                if (close < 0) throw new Error('Invalid selector: ' + selector);
+
+                token = selector.substring(i + 1, close).trim();
+                if (token === '') {
+                    path.push({ type: 'wildcard' });
+                } else if (/^\d+$/.test(token)) {
+                    path.push({ type: 'index', key: parseInt(token, 10) });
+                } else if ((token.charAt(0) === '"' && token.charAt(token.length - 1) === '"') ||
+                           (token.charAt(0) === "'" && token.charAt(token.length - 1) === "'")) {
+                    path.push({ type: 'key', key: token.substring(1, token.length - 1) });
+                } else {
+                    throw new Error('Invalid selector: ' + selector);
+                }
+                i = close + 1;
+                continue;
+            }
+
+            var start = i;
+            while (i < selector.length && selector.charAt(i) !== '.' && selector.charAt(i) !== '[') i++;
+            path.push({ type: 'key', key: selector.substring(start, i) });
+        }
+
+        return path;
+    }
+
+    function applySelector(result, data, path, rootIsArray) {
+        if (rootIsArray) {
+            data.forEach(function(item, index) {
+                if (!result[index]) result[index] = {};
+                copyPath(result[index], item, path, 0);
+            });
+        } else {
+            copyPath(result, data, path, 0);
+        }
+    }
+
+    function copyPath(target, source, path, depth) {
+        if (source === null || typeof source === 'undefined' || depth >= path.length) return;
+
+        var part = path[depth], value;
+
+        if (part.type === 'wildcard') {
+            if (Object.prototype.toString.call(source) !== '[object Array]') return;
+            source.forEach(function(item, index) {
+                if (depth === path.length - 1) {
+                    target[index] = item;
+                    return;
+                }
+
+                if (!target[index]) target[index] = {};
+                copyPath(target[index], item, path, depth + 1);
+            });
+            return;
+        }
+
+        value = source[part.key];
+        if (typeof value === 'undefined') return;
+
+        if (depth === path.length - 1) {
+            target[part.key] = value;
+            return;
+        }
+
+        if (path[depth + 1].type === 'wildcard') {
+            target[part.key] = [];
+        } else if (!target[part.key] || typeof target[part.key] !== 'object') {
+            target[part.key] = {};
+        }
+
+        copyPath(target[part.key], value, path, depth + 1);
+    }
+
     return {
         parse : function(json_str) {
             var temp, errs = {};
@@ -217,6 +502,7 @@ var jsonTreeViewer = (function() {
             }
 
             if (typeof temp === 'undefined') return;
+            sourceJSONObj = temp;
             tree.loadData(temp);
         }
     };
